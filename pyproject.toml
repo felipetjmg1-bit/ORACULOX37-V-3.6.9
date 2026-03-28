@@ -1,0 +1,42 @@
+[project]
+name = "speckle-automate-function"
+version = "0.1.0"
+requires-python = ">=3.11"
+authors = [{ name = "Speckle Systems", email = "hello@speckle.systems" }]
+maintainers = [{ name = "Speckle Systems", email = "hello@speckle.systems" }]
+description = "A Speckle Automate function template using specklepy"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["speckle", "automate", "bim", "aec"]
+
+dependencies = [
+    "specklepy>=3.2.4",
+    "speckle-automate>=0.1.0",
+    "openai>=1.0.0",
+    "pydantic>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy==1.19.1",
+    "pytest==7.4.4",
+    "ruff==0.15.1",
+]
+
+[tool.ruff]
+exclude = [".venv", "**/*.yml"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "UP", # pyupgrade
+    "D",  # pydocstyle
+    "I",  # isort
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.setuptools]
+py-modules = []
