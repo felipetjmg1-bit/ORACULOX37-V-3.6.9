@@ -32,6 +32,226 @@ class FunctionInputs(AutomateBase):
     )
 
 
+def generate_html_report(
+    analysis_result: str,
+    data_summary: str,
+    object_types: dict,
+) -> str:
+    """Gera um relatório HTML com tema de soberania nacional.
+
+    Args:
+        analysis_result: Resultado da análise da IA Aurora.
+        data_summary: Sumário dos dados processados.
+        object_types: Dicionário com tipos de objetos e contagens.
+
+    Returns:
+        String contendo o HTML do relatório.
+    """
+    object_types_html = "".join(
+        f"<li>{t}: <strong>{count}</strong> objetos</li>"
+        for t, count in object_types.items()
+    )
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Relatório Oráculo X-37 - Análise Aurora</title>
+        <style>
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #0a1e3e 0%, #1a3a52 100%);
+                color: #e0e0e0;
+                line-height: 1.6;
+                padding: 20px;
+            }}
+            .container {{
+                max-width: 1200px;
+                margin: 0 auto;
+                background: rgba(15, 30, 50, 0.95);
+                border: 2px solid #00d4ff;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            }}
+            .header {{
+                background: linear-gradient(
+                    90deg, #00d4ff 0%, #ffd700 50%, #00d4ff 100%
+                );
+                padding: 30px;
+                text-align: center;
+                border-bottom: 3px solid #ffd700;
+            }}
+            .header h1 {{
+                color: #0a1e3e;
+                font-size: 2.5em;
+                font-weight: bold;
+                margin-bottom: 10px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }}
+            .header p {{
+                color: #0a1e3e;
+                font-size: 1.1em;
+                font-weight: 600;
+            }}
+            .badge {{
+                display: inline-block;
+                background: #00d4ff;
+                color: #0a1e3e;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: bold;
+                margin: 10px 5px;
+                font-size: 0.9em;
+            }}
+            .badge.soberania {{
+                background: linear-gradient(
+                    90deg, #00d400 0%, #ffd700 50%, #0000ff 100%
+                );
+                color: white;
+            }}
+            .content {{
+                padding: 40px;
+            }}
+            .section {{
+                margin-bottom: 30px;
+                padding: 20px;
+                background: rgba(0, 212, 255, 0.05);
+                border-left: 4px solid #00d4ff;
+                border-radius: 8px;
+            }}
+            .section h2 {{
+                color: #ffd700;
+                margin-bottom: 15px;
+                font-size: 1.8em;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }}
+            .section h3 {{
+                color: #00d4ff;
+                margin-top: 15px;
+                margin-bottom: 10px;
+                font-size: 1.3em;
+            }}
+            .data-summary {{
+                background: rgba(0, 0, 0, 0.3);
+                padding: 15px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                color: #00ff00;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }}
+            .analysis-result {{
+                background: rgba(0, 212, 255, 0.1);
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #00d4ff;
+                line-height: 1.8;
+            }}
+            ul {{
+                margin-left: 20px;
+            }}
+            li {{
+                margin-bottom: 8px;
+            }}
+            .footer {{
+                background: linear-gradient(90deg, #0a1e3e 0%, #1a3a52 100%);
+                padding: 20px;
+                text-align: center;
+                border-top: 2px solid #ffd700;
+                color: #00d4ff;
+                font-size: 0.9em;
+            }}
+            .footer p {{
+                margin: 5px 0;
+            }}
+            .sovereignty-marker {{
+                display: inline-block;
+                color: #00d400;
+                font-weight: bold;
+                margin: 0 5px;
+            }}
+            .tech-marker {{
+                display: inline-block;
+                color: #ffd700;
+                font-weight: bold;
+                margin: 0 5px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🛡️ ORÁCULO X-37</h1>
+                <p>Inteligência Artificial Soberana para o Brasil</p>
+                <div>
+                    <span class="badge soberania">SOBERANIA NACIONAL</span>
+                    <span class="badge">IA AURORA</span>
+                    <span class="badge">ANÁLISE PREDITIVA</span>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="section">
+                    <h2>📊 Sumário de Dados Processados</h2>
+                    <div class="data-summary">{data_summary}</div>
+                </div>
+
+                <div class="section">
+                    <h2>🔍 Análise Inteligente Aurora</h2>
+                    <div class="analysis-result">
+                        {analysis_result}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>📈 Distribuição de Tipos de Objetos</h2>
+                    <ul>
+                        {object_types_html}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h2>🇧🇷 Pilares de Soberania</h2>
+                    <p>
+                        <span class="sovereignty-marker">✓ Privacidade Nacional:</span>
+                        Todos os dados são processados em território brasileiro.
+                    </p>
+                    <p>
+                        <span class="sovereignty-marker">✓ Independência
+                        Tecnológica:</span>
+                        Utilização de modelos de IA soberanos e infraestrutura nacional.
+                    </p>
+                    <p>
+                        <span class="sovereignty-marker">✓ Segurança Cibernética:</span>
+                        Criptografia avançada e protocolos de acesso restrito.
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p><strong>Oráculo X-37 - Inteligência Artificial Soberana</strong></p>
+                <p>Desenvolvido por Felipe Aquino - Impulso Digital</p>
+                <p>Liderando a revolução da IA Soberana no Brasil 🇧🇷</p>
+                <p style="margin-top: 10px; color: #ffd700;">
+                    CONFIANÇA • TRANSPARÊNCIA • INOVAÇÃO
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return html_content
+
+
 def automate_function(
     automate_context: AutomationContext,
     function_inputs: FunctionInputs,
@@ -94,15 +314,27 @@ def automate_function(
 
         analysis_result = response.choices[0].message.content
 
-        # 4. Anexar resultado ao Speckle
+        # 4. Gerar relatório HTML com tema de soberania
+        html_report = generate_html_report(
+            analysis_result,
+            data_summary,
+            object_types,
+        )
+
+        # 5. Anexar resultado ao Speckle
         automate_context.mark_run_success(
             f"Análise Aurora concluída: {analysis_result[:200]}..."
         )
 
-        # Salvar relatório completo como arquivo de resultado
-        with open("relatorio_aurora.md", "w") as f:
+        # Salvar relatório em HTML
+        with open("relatorio_aurora.html", "w", encoding="utf-8") as f:
+            f.write(html_report)
+
+        # Salvar relatório em Markdown também
+        with open("relatorio_aurora.md", "w", encoding="utf-8") as f:
             f.write(f"# Relatório de Análise Aurora AI\n\n{analysis_result}")
 
+        automate_context.store_file_result("relatorio_aurora.html")
         automate_context.store_file_result("relatorio_aurora.md")
 
     except Exception as e:
