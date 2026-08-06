@@ -2,7 +2,14 @@
 
 from collections.abc import Iterable
 
-from specklepy.objects import Base
+try:
+    from specklepy.objects import Base
+except ImportError:
+    class Base:
+        """Fallback Base class if specklepy is not installed locally."""
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 
 
 def flatten_base(base: Base) -> Iterable[Base]:
@@ -17,7 +24,6 @@ def flatten_base(base: Base) -> Iterable[Base]:
     Yields:
         Base: Each nested base object in the hierarchy.
     """
-    # Attempt to get the elements attribute, fallback to @elements if necessary
     elements = getattr(base, "elements", getattr(base, "@elements", None))
 
     if elements is not None:
