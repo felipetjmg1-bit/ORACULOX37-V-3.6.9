@@ -1,18 +1,18 @@
 {
-  "speckleToken": "YOUR SPEKCLE TOKEN",
+  "speckleToken": "YOUR_SPECKLE_TOKEN",
   "functionInputs": {
-    "whisperMessage": "you are doing something weird",
-    "forbiddenSpeckleType": "wall"
+    "openai_api_key": "sk-proj-YOUR_OPENAI_API_KEY",
+    "analysis_prompt": "Realize uma auditoria técnica rigorosa e forneça uma explicação detalhada (XAI) do raciocínio e atribuição de risco para cada componente BIM."
   },
   "automationRunData": {
-    "project_id": "project id",
-    "speckle_server_url": "https://latest.speckle.systems",
-    "automation_id": "automation id",
-    "automation_run_id": "automation run id",
-    "function_run_id": "function run id",
+    "project_id": "project_id_sample",
+    "speckle_server_url": "https://app.speckle.systems",
+    "automation_id": "automation_id_sample",
+    "automation_run_id": "automation_run_id_sample",
+    "function_run_id": "function_run_id_sample",
     "triggers": [
       {
-        "payload": { "modelId": "model id", "versionId": "version id" },
+        "payload": { "modelId": "model_id", "versionId": "version_id" },
         "triggerType": "versionCreation"
       }
     ]
