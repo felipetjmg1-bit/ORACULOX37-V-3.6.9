@@ -1,81 +1,65 @@
-# Oráculo X-37: Inteligência Artificial Soberana para o Brasil 🇧🇷
+![Status: Experimental](https://img.shields.io/badge/Status-Experimental-blue) | [![Licença Apache-2.0](https://img.shields.io/github/license/felipetjmg1-bit/ORACULOX37-V-3.6.9)](LICENSE) | [![Patrocinar](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/felipetjmg1-bit)
 
-![Banner Oráculo X-37](/home/ubuntu/ORACULOX37-V-3.6.9/assets/banner_soberania.png)
+# Oráculo X-37 — Auditoria BIM via Speckle Automate
 
-## Visão Geral
+## Visão geral
 
-O **Oráculo X-37** é a vanguarda da inteligência artificial preditiva, desenvolvida com um propósito inabalável: assegurar a **Soberania Nacional** do Brasil no cenário tecnológico global. Integrado ao ecossistema Speckle, esta solução de IA não apenas analisa dados BIM com precisão cirúrgica, mas o faz sob uma infraestrutura robusta e controlada em território nacional, garantindo privacidade, segurança e autonomia estratégica.
+O código é uma função Python para Speckle Automate que recebe um objeto/versão Speckle, percorre objetos BIM e calcula resumos e algumas métricas heurísticas, com possibilidade de enviar o prompt e o resumo à API OpenAI (modelo gpt-4o-mini). A saída inclui relatórios HTML e Markdown armazenados pelo contexto Speckle. A implementação observável é mais restrita que as alegações de IA preditiva, soberania/offline e auditoria completa do README.
 
-Nascido da visão da Impulso Digital, o Oráculo X-37 representa um marco na construção de um futuro onde o Brasil detém o controle total sobre suas informações e capacidades tecnológicas, impulsionando a inovação e protegendo seus interesses vitais.
+## Objetivo e valor
 
-## 🛡️ Pilares da Soberania Digital
+**Problema/escopo:** Função Python para analisar objetos BIM recebidos via Speckle Automate, calcular verificações heurísticas e gerar relatórios HTML/Markdown com apoio opcional da API OpenAI.
 
-Nosso compromisso com a soberania é fundamentado em princípios inegociáveis:
+**Valor verificável hoje:** o repositório torna explícitos seus artefatos, interfaces e limitações para que mantenedores e contribuidores possam avaliar o que existe sem confundir demonstração, proposta e produção.
 
-*   **Privacidade Nacional**: Todos os dados são processados e armazenados em território brasileiro, blindados contra jurisdições estrangeiras e garantindo a confidencialidade das informações estratégicas.
-*   **Independência de Modelos**: Desenvolvemos e utilizamos modelos de IA soberanos, treinados com dados e perspectivas que refletem a cultura, as necessidades e os valores do Brasil, promovendo uma inteligência verdadeiramente nacional.
-*   **Resiliência Estratégica**: Nossos sistemas são projetados para operar em ambientes críticos, com capacidade offline e infraestrutura descentralizada, assegurando a continuidade das operações mesmo em cenários adversos.
-*   **Segurança Cibernética Avançada**: Implementamos as mais rigorosas práticas de segurança, criptografia de ponta e protocolos de acesso restrito para proteger a integridade e a confidencialidade dos dados.
+## Arquitetura e tecnologias
 
-## 🚀 Recursos Principais
+Parcialmente documentada e não suficiente para sustentar as descrições de arquitetura robusta/modular: uma função Speckle Automate em main.py usa flatten.py para percorrer elementos BIM, monta métricas/resumo por regras, tenta chamada à API OpenAI e grava relatórios HTML/Markdown via AutomationContext. O diagrama Mermaid descreve aproximadamente esse fluxo. Não há evidência de serviço web/API standalone. Algumas métricas e valores de fallback são constantes, não resultados de atribuição XAI demonstrados.
 
-O Oráculo X-37 oferece um conjunto de funcionalidades avançadas para garantir a excelência na análise e proteção de dados:
-
-*   **Análise Preditiva de Dados BIM**: Utiliza algoritmos de IA para identificar padrões, anomalias e riscos em modelos BIM, otimizando projetos e prevenindo falhas.
-*   **Auditoria Técnica Rigorosa**: Realiza verificações automáticas de duplicidade de IDs, inconsistências de materiais e validação da hierarquia espacial, assegurando a qualidade e a conformidade dos modelos.
-*   **Relatórios Inteligentes e Personalizáveis**: Gera relatórios detalhados com insights acionáveis, apresentados de forma clara e objetiva, com foco nas necessidades estratégicas do usuário.
-*   **Integração com Speckle**: Conecta-se perfeitamente à plataforma Speckle, permitindo a ingestão e análise de dados de forma eficiente e automatizada.
-*   **Modelo de IA Otimizado (GPT-4o-mini)**: Emprega um modelo de linguagem avançado para processamento de linguagem natural, garantindo análises contextuais e respostas precisas.
-
-## ⚙️ Arquitetura
-
-O Oráculo X-37 é construído sobre uma arquitetura robusta e modular, projetada para escalabilidade e segurança:
-
-![Diagrama de Arquitetura do Oráculo X-37](/home/ubuntu/ORACULOX37-V-3.6.9/assets/architecture_diagram.png)
-
-## 🛠️ Instalação
-
-Para configurar o Oráculo X-37 em seu ambiente, siga os passos abaixo:
-
-1.  **Clone o Repositório**:
-    ```bash
-    git clone https://github.com/felipetjmg1-bit/ORACULOX37-V-3.6.9.git
-    cd ORACULOX37-V-3.6.9
-    ```
-
-2.  **Instale as Dependências**:
-    ```bash
-    pip install -e .
-    ```
-
-3.  **Configure sua Chave de API OpenAI**: Defina a variável de ambiente `OPENAI_API_KEY` com sua chave de API.
-
-## 🚀 Uso
-
-Para utilizar o Oráculo X-37, execute a função `automate_function` com os parâmetros necessários:
-
-```python
-from speckle_automate import AutomationContext
-from main import automate_function, FunctionInputs
-
-# Exemplo de uso (substitua com seus dados reais)
-automate_context = AutomationContext(...) # Inicialize seu contexto Speckle
-function_inputs = FunctionInputs(openai_api_key="sua_chave_openai", analysis_prompt="Seu prompt de análise aqui")
-
-automate_function(automate_context, function_inputs)
+```mermaid
+flowchart LR
+  S[Versão de modelo Speckle] --> F[Função Python]
+  F --> H[Resumo e heurísticas BIM]
+  H --> O[OpenAI opcional]
+  O --> R[Relatórios HTML e Markdown]
 ```
 
-## 🤝 Contribuição
+- Python (metadado GitHub; pyproject exige Python >=3.11; Dockerfile usa python:3.11-slim)
+- Dependências: specklepy >=3.2.4, speckle-automate >=0.1.0, openai >=2.31.0 e pydantic >=2.13.0
+- Desenvolvimento: pytest, Ruff e mypy declarados como extras dev; existe Dockerfile e workflow GitHub Actions para gerar schema e publicar função Speckle Automate
 
-Valorizamos a colaboração e convidamos a comunidade a contribuir para o aprimoramento do Oráculo X-37. Sinta-se à vontade para abrir *issues*, enviar *pull requests* ou sugerir melhorias. Juntos, fortaleceremos a soberania tecnológica do Brasil.
+## Início rápido
 
-## 📄 Licença
+Os comandos abaixo refletem instruções, manifestos ou pontos de entrada presentes no repositório. Dependências externas, segredos e serviços estão indicados quando aplicável; a presença de um comando não equivale a uma execução validada.
 
-Este projeto está licenciado sob a licença Apache-2.0. Consulte o arquivo `LICENSE` para mais detalhes.
+1. git clone https://github.com/felipetjmg1-bit/ORACULOX37-V-3.6.9.git && cd ORACULOX37-V-3.6.9
+2. pip install -e .; o manifesto exige Python >=3.11. A etapa do README para definir OPENAI_API_KEY não corresponde ao formato de entrada usado no código, que declara openai_api_key em FunctionInputs.
+3. Workflow público instala pip install .[dev], executa python main.py generate_schema ${HOME}/functionSchema.json e configura a publicação para executar python -u main.py run. Esse último comando é usado como comando da função no fluxo Speckle Automate; não está demonstrado como aplicativo standalone.
+4. Há tests/test_function.py, mas o workflow visível não executa testes. Nenhum comando de teste é apresentado como validado por execução na revisão estática do repositório.
 
----
 
-**Desenvolvido por Felipe Aquino - Impulso Digital**
-*Liderando a revolução da IA Soberana no Brasil.*
+## Exemplo de uso
 
-![Logo Oráculo X-37](/home/ubuntu/ORACULOX37-V-3.6.9/assets/logo_soberania.png)
+Exemplo possível conforme interfaces do repositório: configurar no Speckle Automate os FunctionInputs openai_api_key e analysis_prompt, usando o formato ilustrado em example.function_inputs.json, e deixar o runner do Speckle invocar python -u main.py run. O ponto de integração Python declarado é execute_automate_function(automate_function, FunctionInputs); README não fornece contexto Speckle inicializado nem exemplo local autossuficiente.
+
+## Estado e limitações
+
+**Maturidade indicada:** Experimental.
+
+- A implementação tenta enviar o prompt e o resumo dos dados à OpenAI quando há chave utilizável; portanto, o fluxo não é exclusivamente offline. Evitar afirmar residência nacional, soberania de dados, criptografia ou operação offline sem evidência adicional.
+- O código usa valores fixos ou de fallback para várias métricas (incluindo métricas exibidas como integridade hierárquica e IDs únicos); quando não há objetos, substitui o resultado por contagens exemplificativas e total 150. O texto de fallback afirma alta coesão/conformidade mesmo sem análise concluída. Tratar os relatórios como potencialmente sintéticos, não como medições validadas.
+- O README menciona API OpenAI; o manifesto e código confirmam dependência OpenAI, mas nenhum teste de integração ou execução foi realizado na revisão estática do repositório. Não afirmar que instalação, execução, testes ou publicação passaram.
+
+## Contribuição
+
+Leia [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir uma issue ou pull request. Para reportes de segurança, siga a orientação específica do repositório, se houver.
+
+## Licença
+
+Este repositório está licenciado sob **Apache-2.0**; consulte [LICENSE](LICENSE).
+
+## Patrocínio e apoio
+
+O desenvolvimento aberto exige tempo para manutenção, documentação, testes, revisão de contribuições e resposta a issues. Se este projeto for útil, considere apoiar a continuidade pelo [GitHub Sponsors](https://github.com/sponsors/felipetjmg1-bit). O apoio não representa promessa de funcionalidades, prazo de entrega ou suporte comercial.
+
+[![Patrocinar felipetjmg1-bit](https://img.shields.io/badge/Patrocinar%20no-GitHub%20Sponsors-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/felipetjmg1-bit)

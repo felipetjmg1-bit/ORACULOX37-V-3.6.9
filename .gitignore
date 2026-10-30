@@ -315,3 +315,9 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,pycharm
 *.pyc
 node_modules/
+
+# Arquivos locais e artefatos de desenvolvimento
+.DS_Store
+Thumbs.db
+.venv/
+!.env.example
