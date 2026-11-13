@@ -1,8 +1,6 @@
-graph TD
-    A[Dados BIM (Speckle)] --> B(Funcao Automate)
-    B --> C{Processamento Local}
-    C --> D[Sumario de Dados]
-    D --> E[IA Aurora (OpenAI API)]
-    E --> F[Relatorio de Analise]
-    F --> G[Speckle Automate Context]
-    G --> H[Resultados e Arquivos]
+flowchart TB
+  S[Versão do modelo no Speckle] --> T[Travessia iterativa de elements]
+  T --> A[Contagens e regras heurísticas locais]
+  A --> R[Relatórios HTML e Markdown]
+  A -.-> O[OpenAI opcional: comentário sobre resumo agregado]
+  O -.-> R

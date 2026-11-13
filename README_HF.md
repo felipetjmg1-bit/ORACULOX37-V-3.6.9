@@ -1,51 +1,24 @@
 ---
 language:
-- pt
-- en
+  - pt
 license: apache-2.0
 tags:
-- xai
-- explainable-ai
-- bim
-- speckle
-- predictive-maintenance
-- sovereignty
-- national-security
-metrics:
-- accuracy
-- compliance
-- risk-score
-datasets:
-- custom-bim-models
-model-index:
-- name: Oráculo X-37 XAI
-  results:
-  - task:
-      type: structural-audit
-      name: BIM Structural Audit & XAI Attribution
-    metrics:
-    - name: Compliance Score
-      type: compliance
-      value: 95.5
+  - bim
+  - speckle
+  - heuristic-rules
+  - prototype
 ---
 
-# Oráculo X-37: Inteligência Artificial Explicável (XAI) para Soberania Digital e BIM
+# Oráculo X-37 — função exploratória para Speckle Automate
 
-## Visão Geral do Modelo
-O **Oráculo X-37** é um sistema avançado de Inteligência Artificial Explicável (XAI) projetado para auditoria preditiva e análise de modelos BIM (Building Information Modeling). Desenvolvido sob os princípios da soberania nacional de dados, o modelo fornece não apenas previsões e detecção de anomalias com alta precisão, mas também **atribuição completa de importância de características (Feature Attribution)** e rastreabilidade de regras de negócio.
+Este repositório contém software Python experimental para percorrer objetos BIM recebidos pelo Speckle Automate, contar tipos e aplicar verificações heurísticas simples de presença de IDs e da propriedade `material`. Os resultados são publicados como relatórios HTML e Markdown.
 
-## Arquitetura de Explicabilidade (XAI)
-Diferente de modelos de "caixa-preta", o Oráculo X-37 incorpora:
-1. **Transparência de Decisão**: Cada achado de anomalia ou risco estrutural é acompanhado por um percentual de impacto e pontuação de confiança.
-2. **Auditoria de Regras Locais**: Validação cruzada entre metadados BIM e heurísticas de conformidade.
-3. **Relatórios Imersivos**: Geração automática de relatórios de auditoria estruturados em HTML e Markdown com indicadores de conformidade.
+## Escopo
 
-## Como Usar
-```python
-from transformers import AutoModel
-# O Oráculo X-37 opera integrado ao ecossistema Speckle e motores Aurora AI.
-```
+O projeto **não contém um modelo de machine learning nem pesos treinados**. Não há benchmark ou métrica de precisão validada. O código não calcula estruturas, não estima risco, não certifica conformidade e não implementa explicabilidade de modelos. A chamada opcional à OpenAI fornece apenas comentário textual sobre contagens agregadas; não é validação técnica.
 
----
-**Desenvolvido por Felipe Aquino - Impulso Digital**
-*Liderando a revolução da IA Soberana no Brasil 🇧🇷*
+## Uso de dados
+
+Sem `openaiApiKey`, nenhuma solicitação à OpenAI é feita. Quando a chave é informada, o código envia o prompt e contagens agregadas por tipo; não envia objetos individuais nem IDs pelo resumo. Nomes de tipos e prompts podem ser confidenciais e precisam de revisão antes do uso.
+
+Para instalação, configuração, comandos e limitações, consulte o [README principal](README.md). O projeto está licenciado sob Apache-2.0.

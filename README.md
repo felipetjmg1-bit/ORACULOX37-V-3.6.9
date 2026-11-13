@@ -1,65 +1,96 @@
-![Status: Experimental](https://img.shields.io/badge/Status-Experimental-blue) | [![Licença Apache-2.0](https://img.shields.io/github/license/felipetjmg1-bit/ORACULOX37-V-3.6.9)](LICENSE) | [![Patrocinar](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/felipetjmg1-bit)
+# Oráculo X-37 — verificações exploratórias de BIM no Speckle
 
-# Oráculo X-37 — Auditoria BIM via Speckle Automate
+![Status: experimental](https://img.shields.io/badge/status-experimental-orange)
+[![Licença Apache-2.0](https://img.shields.io/github/license/felipetjmg1-bit/ORACULOX37-V-3.6.9)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
 
-## Visão geral
+**Oráculo X-37** é uma função Python para Speckle Automate. Ela percorre a árvore de objetos recebida e produz contagens e verificações heurísticas simples, com relatórios HTML e Markdown. Um comentário textual opcional pode ser solicitado à API da OpenAI.
 
-O código é uma função Python para Speckle Automate que recebe um objeto/versão Speckle, percorre objetos BIM e calcula resumos e algumas métricas heurísticas, com possibilidade de enviar o prompt e o resumo à API OpenAI (modelo gpt-4o-mini). A saída inclui relatórios HTML e Markdown armazenados pelo contexto Speckle. A implementação observável é mais restrita que as alegações de IA preditiva, soberania/offline e auditoria completa do README.
+> **Maturidade e uso pretendido:** o Oráculo X-37 é um protótipo de nível inicial a intermediário, desenvolvido no contexto de aprendizado aplicado do autor em Python e Speckle Automate, com comentário externo opcional via OpenAI.
+>
+> O autor também estuda ferramentas como FastAPI, MCP e Gradio em experimentos separados; este repositório não reivindica integração com elas. Ainda não há tecnologia proprietária disruptiva nem validação comercial consolidada.
+>
+> O projeto não é um modelo preditivo, não realiza cálculo estrutural, não certifica conformidade normativa e não deve fundamentar decisões de segurança ou engenharia sem validação independente.
 
-## Objetivo e valor
+## O que a implementação faz hoje
 
-**Problema/escopo:** Função Python para analisar objetos BIM recebidos via Speckle Automate, calcular verificações heurísticas e gerar relatórios HTML/Markdown com apoio opcional da API OpenAI.
+- Percorre objetos acessíveis pela propriedade `elements` ou `@elements`, incluindo o objeto raiz, com proteção contra ciclos.
+- Conta objetos por `speckle_type`.
+- Aplica uma heurística baseada nos termos `structure`, `beam`, `column` e `wall` para identificar tipos potencialmente estruturais.
+- Conta objetos sem `id`, ocorrências excedentes de IDs repetidos e objetos identificados pela heurística sem a propriedade `material` preenchida.
+- Armazena relatórios HTML e Markdown no resultado da execução Speckle Automate.
+- Se uma chave for configurada, pode enviar à OpenAI o prompt informado e um resumo agregado por tipo. Objetos BIM brutos e IDs individuais não fazem parte desse resumo.
 
-**Valor verificável hoje:** o repositório torna explícitos seus artefatos, interfaces e limitações para que mantenedores e contribuidores possam avaliar o que existe sem confundir demonstração, proposta e produção.
+As verificações são contagens e regras de presença implementadas em `audit.py`; não são uma pontuação de risco, medição de qualidade, explicação de um modelo de machine learning nem prova de conformidade.
 
-## Arquitetura e tecnologias
+## Arquitetura
 
-Parcialmente documentada e não suficiente para sustentar as descrições de arquitetura robusta/modular: uma função Speckle Automate em main.py usa flatten.py para percorrer elementos BIM, monta métricas/resumo por regras, tenta chamada à API OpenAI e grava relatórios HTML/Markdown via AutomationContext. O diagrama Mermaid descreve aproximadamente esse fluxo. Não há evidência de serviço web/API standalone. Algumas métricas e valores de fallback são constantes, não resultados de atribuição XAI demonstrados.
+![Fluxo implementado no Oráculo X-37](assets/architecture_diagram.png)
 
-```mermaid
-flowchart LR
-  S[Versão de modelo Speckle] --> F[Função Python]
-  F --> H[Resumo e heurísticas BIM]
-  H --> O[OpenAI opcional]
-  O --> R[Relatórios HTML e Markdown]
+[Fonte editável do diagrama](assets/architecture_diagram.mmd).
+
+- `main.py`: integração com Speckle Automate, geração de relatórios e comentário externo opcional.
+- `flatten.py`: travessia iterativa da árvore `elements`, com proteção contra ciclos.
+- `audit.py`: regras locais e formatação do resumo agregado.
+- `tests/`: testes unitários sem conexão com Speckle ou OpenAI.
+
+## Limitações importantes
+
+- A identificação de objetos estruturais depende apenas de correspondência de palavras no nome do tipo; ela pode classificar itens incorretamente ou deixar tipos de fora.
+- A propriedade de material examinada é `material`; o código não interpreta toda a variedade de propriedades, classificações ou vínculos possíveis em modelos BIM.
+- O código não verifica geometria, cálculos, hierarquia espacial, normas, segurança, validade de projeto, causalidade ou risco estrutural.
+- IDs são comparados como texto exatamente como recebidos. O relatório mostra contagens, mas não inclui os valores de IDs.
+- O comentário da OpenAI é texto gerado externamente e não é uma validação independente. Falhas nesse serviço não impedem a geração local do relatório.
+- O repositório não demonstra integração com DREX, infraestrutura nacional, criptografia específica, certificação de segurança, operação exclusivamente offline ou explicabilidade nativa de um modelo de IA.
+
+## Privacidade e segredos
+
+Sem `openaiApiKey`, a função não tenta chamar a OpenAI. Quando a chave é fornecida, somente o prompt configurado e o resumo agregado por tipo são enviados para o serviço externo; não são enviados objetos BIM individuais nem seus IDs por esse caminho. Avalie, ainda assim, se os nomes de tipos e o prompt podem conter informações confidenciais. Use os campos protegidos de entrada do Speckle Automate para segredos. Não faça commit de chaves ou tokens em arquivos JSON, `.env` ou logs.
+
+## Instalação e validação local
+
+Requisitos: Python 3.11 ou superior.
+
+```bash
+git clone https://github.com/felipetjmg1-bit/ORACULOX37-V-3.6.9.git
+cd ORACULOX37-V-3.6.9
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+python -m pytest
+ruff check .
 ```
 
-- Python (metadado GitHub; pyproject exige Python >=3.11; Dockerfile usa python:3.11-slim)
-- Dependências: specklepy >=3.2.4, speckle-automate >=0.1.0, openai >=2.31.0 e pydantic >=2.13.0
-- Desenvolvimento: pytest, Ruff e mypy declarados como extras dev; existe Dockerfile e workflow GitHub Actions para gerar schema e publicar função Speckle Automate
+Os testes unitários usam objetos fictícios pequenos e não acessam modelos de clientes, o Speckle hospedado nem a OpenAI. Passar nesses testes não constitui validação de desempenho em modelos BIM reais.
 
-## Início rápido
+## Execução no Speckle Automate
 
-Os comandos abaixo refletem instruções, manifestos ou pontos de entrada presentes no repositório. Dependências externas, segredos e serviços estão indicados quando aplicável; a presença de um comando não equivale a uma execução validada.
+O workflow de publicação gera o schema com:
 
-1. git clone https://github.com/felipetjmg1-bit/ORACULOX37-V-3.6.9.git && cd ORACULOX37-V-3.6.9
-2. pip install -e .; o manifesto exige Python >=3.11. A etapa do README para definir OPENAI_API_KEY não corresponde ao formato de entrada usado no código, que declara openai_api_key em FunctionInputs.
-3. Workflow público instala pip install .[dev], executa python main.py generate_schema ${HOME}/functionSchema.json e configura a publicação para executar python -u main.py run. Esse último comando é usado como comando da função no fluxo Speckle Automate; não está demonstrado como aplicativo standalone.
-4. Há tests/test_function.py, mas o workflow visível não executa testes. Nenhum comando de teste é apresentado como validado por execução na revisão estática do repositório.
+```bash
+python main.py generate_schema functionSchema.json
+```
 
+O runner do Speckle executa a função com:
 
-## Exemplo de uso
+```bash
+python -u main.py run
+```
 
-Exemplo possível conforme interfaces do repositório: configurar no Speckle Automate os FunctionInputs openai_api_key e analysis_prompt, usando o formato ilustrado em example.function_inputs.json, e deixar o runner do Speckle invocar python -u main.py run. O ponto de integração Python declarado é execute_automate_function(automate_function, FunctionInputs); README não fornece contexto Speckle inicializado nem exemplo local autossuficiente.
+No formulário do Speckle, os campos são publicados como `analysisPrompt` e `openaiApiKey`. A chave é opcional; quando ausente, os relatórios contêm somente os resultados locais. O arquivo `example.function_inputs.json` é ilustrativo e seus valores de placeholder não são credenciais utilizáveis.
 
-## Estado e limitações
+A execução é marcada como falha quando não recebe uma versão de modelo, não consegue percorrer objetos ou não consegue gravar/armazenar os relatórios. A falha da chamada opcional à OpenAI é indicada no relatório; nesse caso, as contagens locais continuam disponíveis.
 
-**Maturidade indicada:** Experimental.
+## Desenvolvimento
 
-- A implementação tenta enviar o prompt e o resumo dos dados à OpenAI quando há chave utilizável; portanto, o fluxo não é exclusivamente offline. Evitar afirmar residência nacional, soberania de dados, criptografia ou operação offline sem evidência adicional.
-- O código usa valores fixos ou de fallback para várias métricas (incluindo métricas exibidas como integridade hierárquica e IDs únicos); quando não há objetos, substitui o resultado por contagens exemplificativas e total 150. O texto de fallback afirma alta coesão/conformidade mesmo sem análise concluída. Tratar os relatórios como potencialmente sintéticos, não como medições validadas.
-- O README menciona API OpenAI; o manifesto e código confirmam dependência OpenAI, mas nenhum teste de integração ou execução foi realizado na revisão estática do repositório. Não afirmar que instalação, execução, testes ou publicação passaram.
+```bash
+python -m pytest
+ruff check .
+```
 
-## Contribuição
+Pull requests devem descrever mudanças, verificações executadas e limitações remanescentes. Consulte [CONTRIBUTING.md](CONTRIBUTING.md) e [SECURITY.md](SECURITY.md).
 
-Leia [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir uma issue ou pull request. Para reportes de segurança, siga a orientação específica do repositório, se houver.
+## Licença e contato
 
-## Licença
-
-Este repositório está licenciado sob **Apache-2.0**; consulte [LICENSE](LICENSE).
-
-## Patrocínio e apoio
-
-O desenvolvimento aberto exige tempo para manutenção, documentação, testes, revisão de contribuições e resposta a issues. Se este projeto for útil, considere apoiar a continuidade pelo [GitHub Sponsors](https://github.com/sponsors/felipetjmg1-bit). O apoio não representa promessa de funcionalidades, prazo de entrega ou suporte comercial.
-
-[![Patrocinar felipetjmg1-bit](https://img.shields.io/badge/Patrocinar%20no-GitHub%20Sponsors-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/felipetjmg1-bit)
+Este projeto está sob a licença [Apache-2.0](LICENSE). O código e a documentação descrevem o estado observável do protótipo; não representam certificação, promessa de desempenho, prazo de entrega ou garantia de adequação a uma finalidade específica.

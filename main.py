@@ -1,402 +1,260 @@
-"""Oráculo X-37: Sistema de IA preditiva e explicável (XAI) para análise estratégica e BIM.
+"""Oráculo X-37: exploratory BIM checks for Speckle Automate.
 
-Integrando IA (Aurora) para análise inteligente, transparente e auditável de dados BIM no Speckle.
+The local rules report simple counts only. They are not a structural
+engineering assessment, compliance certification, risk model, or XAI system.
 """
 
-import os
+import logging
+import re
+from html import escape
+from pathlib import Path
 
-try:
-    from openai import OpenAI
-except ImportError:
-    OpenAI = None
+from openai import OpenAI
+from pydantic import Field, SecretStr
+from speckle_automate import (
+    AutomateBase,
+    AutomationContext,
+    execute_automate_function,
+)
 
-try:
-    from pydantic import Field, SecretStr
-    from speckle_automate import (
-        AutomateBase,
-        AutomationContext,
-        execute_automate_function,
-    )
-except ImportError:
-    # Fallback stubs for local testing without speckle_automate installed
-    class AutomateBase:
-        def __init__(self, **kwargs):
-            for k, v in kwargs.items():
-                setattr(self, k, v)
-
-    class AutomationContext:
-        def receive_version(self):
-            return None
-        def mark_run_success(self, msg):
-            pass
-        def mark_run_failed(self, msg):
-            pass
-        def store_file_result(self, path):
-            pass
-
-    def execute_automate_function(func, inputs_class):
-        pass
-
-    class Field:
-        def __init__(self, *args, **kwargs):
-            pass
-
-    class SecretStr:
-        def __init__(self, val):
-            self._val = val
-        def get_secret_value(self):
-            return self._val
-
+from audit import AuditResult, audit_objects, format_audit_summary
 from flatten import flatten_base
+
+logger = logging.getLogger(__name__)
 
 
 class FunctionInputs(AutomateBase):
-    """Parâmetros de entrada para a função Oráculo X-37 / Aurora AI."""
+    """Optional external commentary settings for the Speckle function."""
 
-    openai_api_key: SecretStr = Field(
-        title="OpenAI API Key",
-        description="Chave de acesso à API para o motor de IA preditiva e XAI."
+    openai_api_key: SecretStr | None = Field(
+        default=None,
+        title="OpenAI API Key (optional)",
+        description=(
+            "Optional. If provided, aggregate object-type counts and the prompt "
+            "are sent to OpenAI for non-authoritative commentary."
+        ),
     )
     analysis_prompt: str = Field(
         default=(
-            "Realize uma auditoria técnica rigorosa com explicabilidade (XAI). "
-            "Verifique duplicidade de IDs, inconsistências de materiais, "
-            "atribuição de risco e hierarquia espacial."
+            "Summarize the aggregate BIM object counts below. Do not infer "
+            "structural safety, regulatory compliance, causal relationships, "
+            "or risk scores. Clearly state that the result is not an "
+            "engineering assessment."
         ),
-        title="Prompt de Análise Explicável (XAI)",
-        description="Instruções específicas para a auditoria e rastreabilidade de IA."
+        title="Optional commentary prompt",
+        description="Instructions for the optional external text commentary.",
     )
+
+
+def _metric_values(result: AuditResult) -> dict[str, int | str]:
+    """Return labels and observed counts for presentation in the report."""
+    material_count: int | str = (
+        result.structural_objects_without_material
+        if result.structural_objects
+        else "not assessed"
+    )
+    return {
+        "Objects traversed": result.total_objects,
+        "Object types found": len(result.object_types),
+        "Structural objects (name heuristic)": result.structural_objects,
+        "Structural objects without material": material_count,
+        "Objects without ID": result.objects_without_id,
+        "Extra occurrences of duplicate IDs": result.duplicate_id_occurrences,
+        "Distinct duplicate ID values": result.distinct_duplicate_ids,
+    }
 
 
 def generate_html_report(
     analysis_result: str,
     data_summary: str,
-    object_types: dict,
-    xai_metrics: dict,
+    object_types: dict[str, int],
+    audit_metrics: dict[str, int | str],
 ) -> str:
-    """Gera um relatório HTML profissional com tema de soberania nacional e XAI."""
-    object_types_html = "".join(
-        f"<li>{t}: <strong>{count}</strong> objetos</li>"
-        for t, count in object_types.items()
+    """Render an HTML report with all dynamic text escaped as plain text."""
+    type_rows = "".join(
+        "<tr><td>"
+        + escape(str(type_name), quote=True)
+        + "</td><td>"
+        + escape(str(count), quote=True)
+        + "</td></tr>"
+        for type_name, count in sorted(object_types.items())
+    )
+    metric_rows = "".join(
+        "<li><strong>"
+        + escape(str(label), quote=True)
+        + ":</strong> "
+        + escape(str(value), quote=True)
+        + "</li>"
+        for label, value in audit_metrics.items()
     )
 
-    xai_features_html = "".join(
-        f"<li><strong>{feat}:</strong> Impacto de {score}% na Decisão</li>"
-        for feat, score in xai_metrics.items()
-    )
+    return f"""<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oráculo X-37 — Relatório exploratório BIM</title>
+  <style>
+    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}
+    body {{ margin: 0; padding: 2rem 1rem; background: #f3f6fb; color: #17243a; }}
+    main {{ max-width: 980px; margin: auto; padding: 2rem; background: #fff;
+            border: 1px solid #d8e0ea; border-radius: 14px; }}
+    h1, h2 {{ color: #123b67; }}
+    .notice {{ padding: 1rem; background: #fff4d6; border-left: 4px solid #d89400; }}
+    pre {{ white-space: pre-wrap; overflow-wrap: anywhere; background: #f5f7fa;
+          padding: 1rem; border-radius: 8px; }}
+    table {{ border-collapse: collapse; width: 100%; }}
+    th, td {{ text-align: left; padding: .65rem; border-bottom: 1px solid #d8e0ea; }}
+    footer {{ margin-top: 2rem; color: #52647a; font-size: .9rem; }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Oráculo X-37 — relatório exploratório BIM</h1>
+    <p class="notice"><strong>Limitação:</strong> este relatório contém verificações
+    heurísticas e contagens. Não certifica conformidade, segurança estrutural,
+    risco, nem fornece uma avaliação de engenharia ou explicabilidade de modelo.
+    </p>
+    <h2>Resumo observado</h2>
+    <pre>{escape(data_summary, quote=True)}</pre>
+    <h2>Contagens da auditoria local</h2>
+    <ul>{metric_rows}</ul>
+    <h2>Distribuição por tipo</h2>
+    <table><thead><tr><th>Tipo</th><th>Quantidade</th></tr></thead>
+    <tbody>{type_rows}</tbody></table>
+    <h2>Comentário externo opcional</h2>
+    <pre>{escape(analysis_result, quote=True)}</pre>
+    <footer>Impulso Digital — protótipo experimental. Revise os dados e as regras
+    antes de qualquer uso operacional.</footer>
+  </main>
+</body>
+</html>
+"""
 
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Relatório Oráculo X-37 - XAI & Auditoria Aurora</title>
-        <style>
-            * {{
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }}
-            body {{
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #0a1e3e 0%, #1a3a52 100%);
-                color: #e0e0e0;
-                line-height: 1.6;
-                padding: 20px;
-            }}
-            .container {{
-                max-width: 1200px;
-                margin: 0 auto;
-                background: rgba(15, 30, 50, 0.95);
-                border: 2px solid #00d4ff;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-            }}
-            .header {{
-                background: linear-gradient(
-                    90deg, #00d4ff 0%, #ffd700 50%, #00d4ff 100%
-                );
-                padding: 30px;
-                text-align: center;
-                border-bottom: 3px solid #ffd700;
-            }}
-            .header h1 {{
-                color: #0a1e3e;
-                font-size: 2.5em;
-                font-weight: bold;
-                margin-bottom: 10px;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            }}
-            .header p {{
-                color: #0a1e3e;
-                font-size: 1.1em;
-                font-weight: 600;
-            }}
-            .badge {{
-                display: inline-block;
-                background: #00d4ff;
-                color: #0a1e3e;
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-weight: bold;
-                margin: 10px 5px;
-                font-size: 0.9em;
-            }}
-            .badge.soberania {{
-                background: linear-gradient(
-                    90deg, #00d400 0%, #ffd700 50%, #0000ff 100%
-                );
-                color: white;
-            }}
-            .section {{
-                margin-bottom: 30px;
-                padding: 20px;
-                background: rgba(0, 212, 255, 0.05);
-                border-left: 4px solid #00d4ff;
-                border-radius: 8px;
-            }}
-            .section h2 {{
-                color: #ffd700;
-                margin-bottom: 15px;
-                font-size: 1.8em;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-            }}
-            .data-summary {{
-                background: rgba(0, 0, 0, 0.3);
-                padding: 15px;
-                border-radius: 8px;
-                font-family: 'Courier New', monospace;
-                color: #00ff00;
-                white-space: pre-wrap;
-                word-wrap: break-word;
-            }}
-            .analysis-result {{
-                background: rgba(0, 212, 255, 0.1);
-                padding: 20px;
-                border-radius: 8px;
-                border: 1px solid #00d4ff;
-                line-height: 1.8;
-            }}
-            ul {{
-                margin-left: 20px;
-            }}
-            li {{
-                margin-bottom: 8px;
-            }}
-            .footer {{
-                background: linear-gradient(90deg, #0a1e3e 0%, #1a3a52 100%);
-                padding: 20px;
-                text-align: center;
-                border-top: 2px solid #ffd700;
-                color: #00d4ff;
-                font-size: 0.9em;
-            }}
-            .footer p {{
-                margin: 5px 0;
-            }}
-            .sovereignty-marker {{
-                display: inline-block;
-                color: #00d400;
-                font-weight: bold;
-                margin: 0 5px;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>🛡️ ORÁCULO X-37 (XAI)</h1>
-                <p>Inteligência Artificial Explicável & Soberana para o Brasil</p>
-                <div>
-                    <span class="badge soberania">IA EXPLICÁVEL (XAI)</span>
-                    <span class="badge">AUDITORIA AURORA</span>
-                    <span class="badge">SISTEMA OFFLINE</span>
-                </div>
-            </div>
 
-            <div class="content" style="padding: 30px;">
-                <div class="section">
-                    <h2>📊 Sumário de Dados BIM Processados</h2>
-                    <div class="data-summary">{data_summary}</div>
-                </div>
+def _optional_external_commentary(
+    api_key: SecretStr | None,
+    prompt: str,
+    data_summary: str,
+) -> str:
+    """Request optional commentary using aggregate data, never raw BIM objects."""
+    if api_key is None or not api_key.get_secret_value().strip():
+        return (
+            "Comentário externo não solicitado. Este relatório contém apenas "
+            "contagens e verificações heurísticas locais."
+        )
 
-                <div class="section">
-                    <h2>🔍 Análise Preditiva e Rastreabilidade (Aurora XAI)</h2>
-                    <div class="analysis-result">
-                        {analysis_result}
-                    </div>
-                </div>
+    try:
+        client = OpenAI(api_key=api_key.get_secret_value(), timeout=30.0)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Summarize only the aggregate counts supplied by the user. "
+                        "Do not claim to perform structural calculations, certify "
+                        "regulatory compliance, estimate risk, or provide XAI. "
+                        "State that this text is non-authoritative commentary."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"{prompt.strip()}\n\nAggregate audit summary:\n{data_summary}"
+                    ),
+                },
+            ],
+            max_tokens=300,
+            temperature=0.2,
+        )
+        content = response.choices[0].message.content
+        if content and content.strip():
+            return (
+                "Comentário gerado por OpenAI (não é validação técnica):\n\n"
+                + content.strip()
+            )
+        return "OpenAI não retornou comentário. Consulte apenas as contagens locais."
+    except Exception as error:
+        return (
+            "Comentário externo indisponível ("
+            f"{type(error).__name__}). O relatório contém apenas as verificações "
+            "determinísticas locais."
+        )
 
-                <div class="section">
-                    <h2>🧠 Atribuição de Importância (XAI Feature Attribution)</h2>
-                    <p>Percentual de relevância dos fatores avaliados pelo modelo na tomada de decisão:</p>
-                    <ul style="margin-top: 10px;">
-                        {xai_features_html}
-                    </ul>
-                </div>
 
-                <div class="section">
-                    <h2>📈 Distribuição de Tipos de Objetos</h2>
-                    <ul>
-                        {object_types_html}
-                    </ul>
-                </div>
+def _mark_failed(context: AutomationContext, message: str) -> None:
+    """Try to mark the Speckle run as failed without hiding the original error."""
+    try:
+        context.mark_run_failed(message)
+    except Exception:
+        pass
 
-                <div class="section">
-                    <h2>🇧🇷 Pilares de Soberania e Transparência</h2>
-                    <p>
-                        <span class="sovereignty-marker">✓ Explicabilidade Total (XAI):</span>
-                        Decisões auditáveis com rastreabilidade de regras e pesos de features.
-                    </p>
-                    <p>
-                        <span class="sovereignty-marker">✓ Privacidade Nacional:</span>
-                        Processamento seguro em infraestrutura controlada.
-                    </p>
-                    <p>
-                        <span class="sovereignty-marker">✓ Segurança Cibernética:</span>
-                        Criptografia de ponta e isolamento operacional.
-                    </p>
-                </div>
-            </div>
 
-            <div class="footer">
-                <p><strong>Oráculo X-37 - Inteligência Artificial Explicável</strong></p>
-                <p>Desenvolvido por Felipe Aquino - Impulso Digital</p>
-                <p>Liderando a revolução da IA Soberana no Brasil 🇧🇷</p>
-                <p style="margin-top: 10px; color: #ffd700;">
-                    TRANSPARÊNCIA • EXPLICABILIDADE • SOBERANIA
-                </p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
-    return html_content
+def _markdown_code_block(text: str) -> str:
+    """Wrap untrusted text in a fence longer than any backtick run in it."""
+    longest_run = max((len(run) for run in re.findall(r"`+", text)), default=0)
+    fence = "`" * max(3, longest_run + 1)
+    return f"{fence}text\n{text}\n{fence}"
 
 
 def automate_function(
     automate_context: AutomationContext,
     function_inputs: FunctionInputs,
 ) -> None:
-    """Recebe dados do Speckle e os envia para análise via IA Aurora com XAI."""
+    """Run simple local checks and store reports in the Speckle Automation run."""
     try:
         version_root_object = automate_context.receive_version()
-        flat_objects = list(flatten_base(version_root_object)) if version_root_object else []
-    except Exception:
-        flat_objects = []
+        if version_root_object is None:
+            raise ValueError("Speckle did not provide a model version object.")
 
-    object_types = {}
-    missing_params = []
-    structural_count = 0
-    material_missing_count = 0
-
-    for obj in (flat_objects if flat_objects else []):
-        t = getattr(obj, "speckle_type", "BaseObject")
-        object_types[t] = object_types.get(t, 0) + 1
-
-        if "Structure" in t or "Beam" in t or "Column" in t or "Wall" in t:
-            structural_count += 1
-            if not hasattr(obj, "material") or not obj.material:
-                material_missing_count += 1
-                missing_params.append(
-                    f"Componente {getattr(obj, 'id', 'unknown')} ({t}) sem material especificado."
-                )
-
-    if not object_types:
-        object_types = {"Objects.BuiltElements.Beam": 45, "Objects.BuiltElements.Column": 30, "Objects.BuiltElements.Wall": 75}
-
-    total_analyzed = len(flat_objects) if flat_objects else 150
-    risk_factor = (material_missing_count / max(structural_count, 1)) * 100 if structural_count > 0 else 3.2
-    compliance_score = max(0.0, 100.0 - risk_factor)
-
-    xai_metrics = {
-        "Integridade Hierárquica Espacial": 94.5,
-        "Consistência de Materiais BIM": round(compliance_score, 1),
-        "Validação de IDs Únicos": 99.1,
-        "Atribuição de Risco Estrutural": round(risk_factor, 1),
-    }
-
-    data_summary = "Relatório de Dados BIM & XAI:\n"
-    data_summary += f"- Total de objetos inspecionados: {total_analyzed}\n"
-    data_summary += f"- Índice de Conformidade de Materiais: {compliance_score:.1f}%\n"
-    data_summary += f"- Fator de Risco Estrutural Calculado: {risk_factor:.1f}%\n\n"
-    data_summary += "Distribuição de tipos:\n"
-    for t, count in object_types.items():
-        data_summary += f"  * {t}: {count}\n"
-
-    if missing_params:
-        data_summary += "\nAnomalias detectadas pelo motor de regras XAI:\n"
-        data_summary += "\n".join(missing_params[:10])
-    else:
-        data_summary += "\nStatus: Nenhuma anomalia crítica detectada pelo motor XAI local."
-
-    analysis_result = None
-    try:
-        api_key_val = function_inputs.openai_api_key.get_secret_value()
-        if OpenAI and api_key_val and not api_key_val.startswith("sk-test"):
-            client = OpenAI(api_key=api_key_val)
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "Você é a Aurora, especialista em IA Explicável (XAI) "
-                            "e análise de dados BIM. Forneça explicações detalhadas, "
-                            "transparentes e justificadas para cada achado."
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": (
-                            f"{function_inputs.analysis_prompt}\n\n"
-                            f"Métricas XAI e Dados do Modelo:\n{data_summary}"
-                        ),
-                    },
-                ]
+        objects = list(flatten_base(version_root_object))
+        if not objects:
+            raise ValueError(
+                "The received model version contains no traversable objects."
             )
-            analysis_result = response.choices[0].message.content
-    except Exception as api_err:
-        analysis_result = None
 
-    if not analysis_result:
-        analysis_result = (
-            f"[Modo de Explicabilidade Robusto Ativado]\n"
-            "Parecer Aurora XAI: O modelo BIM analisado demonstra alta coesão estrutural e conformidade regulatória. "
-            "A atribuição de importância aponta estabilidade hierárquica superior a 94%, com baixo fator de risco estrutural."
+        result = audit_objects(objects)
+        data_summary = format_audit_summary(result)
+        commentary = _optional_external_commentary(
+            getattr(function_inputs, "openai_api_key", None),
+            getattr(function_inputs, "analysis_prompt", "") or "",
+            data_summary,
+        )
+        metrics = _metric_values(result)
+        html_report = generate_html_report(
+            commentary,
+            data_summary,
+            result.object_types,
+            metrics,
+        )
+        markdown_report = (
+            "# Oráculo X-37 — relatório exploratório BIM\n\n"
+            "> Protótipo heurístico; não é avaliação de engenharia, certificação de "
+            "conformidade, cálculo estrutural, modelo de risco ou explicabilidade "
+            "de modelo.\n\n"
+            "## Resumo observado\n\n"
+            f"{_markdown_code_block(data_summary)}\n\n"
+            "## Comentário externo opcional\n\n"
+            f"{_markdown_code_block(commentary)}\n"
         )
 
-    html_report = generate_html_report(
-        analysis_result,
-        data_summary,
-        object_types,
-        xai_metrics,
-    )
-
-    try:
+        html_path = Path("relatorio_aurora.html")
+        markdown_path = Path("relatorio_aurora.md")
+        html_path.write_text(html_report, encoding="utf-8")
+        markdown_path.write_text(markdown_report, encoding="utf-8")
+        automate_context.store_file_result(str(html_path))
+        automate_context.store_file_result(str(markdown_path))
         automate_context.mark_run_success(
-            f"Análise XAI Aurora concluída com sucesso. Índice de Conformidade: {compliance_score:.1f}%"
+            f"Verificações heurísticas concluídas para {result.total_objects} objetos."
         )
-    except Exception:
-        pass
-
-    with open("relatorio_aurora.html", "w", encoding="utf-8") as f:
-        f.write(html_report)
-
-    with open("relatorio_aurora.md", "w", encoding="utf-8") as f:
-        f.write(
-            f"# Relatório de Análise XAI - Oráculo X-37\n\n{analysis_result}\n\n## Métricas XAI\n"
-            + "\n".join([f"- **{k}**: {v}%" for k, v in xai_metrics.items()])
+    except Exception as error:
+        logger.error("BIM audit did not complete (%s).", type(error).__name__)
+        _mark_failed(
+            automate_context,
+            f"Auditoria não concluída ({type(error).__name__}); "
+            "consulte os logs da automação.",
         )
-
-    try:
-        automate_context.store_file_result("relatorio_aurora.html")
-        automate_context.store_file_result("relatorio_aurora.md")
-    except Exception:
-        pass
 
 
 if __name__ == "__main__":
