@@ -17,7 +17,9 @@ Este repositório contém uma função Python experimental para Speckle Automate
 
 ## Estágio de desenvolvimento
 
-O projeto reflete a fase de experimentação e estudo prático do autor com ferramentas modernas e é um protótipo de nível inicial a intermediário. Este repositório contém Python, Speckle Automate e uma integração opcional com a API da OpenAI. FastAPI, MCP e Gradio são explorados em outros experimentos e não são funcionalidades ou dependências deste código. Não há tecnologia proprietária disruptiva nem validação comercial consolidada.
+O Oráculo X-37 é um protótipo de nível inicial a intermediário, desenvolvido como parte do aprendizado aplicado do autor com Python e Speckle Automate. A função oferece comentário externo opcional pela API da OpenAI.
+
+FastAPI, MCP e Gradio são estudados em experimentos separados e não são funcionalidades nem dependências deste repositório. O projeto não reivindica tecnologia proprietária disruptiva nem validação comercial consolidada.
 
 ## Não é um modelo de machine learning
 

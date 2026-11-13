@@ -6,7 +6,11 @@
 
 **Oráculo X-37** é uma função Python para Speckle Automate. Ela percorre a árvore de objetos recebida e produz contagens e verificações heurísticas simples, com relatórios HTML e Markdown. Um comentário textual opcional pode ser solicitado à API da OpenAI.
 
-> **Maturidade e uso pretendido:** este repositório reflete a fase de experimentação e estudo prático do autor com ferramentas modernas. É um protótipo de nível inicial a intermediário em Python e Speckle Automate, com uso opcional da API da OpenAI. FastAPI, MCP e Gradio são temas explorados em outros experimentos do autor, não integrações presentes neste repositório. Não há tecnologia proprietária disruptiva nem validação comercial consolidada. O projeto não é um modelo preditivo, não realiza cálculo estrutural, não certifica conformidade normativa e não deve fundamentar decisões de segurança ou engenharia sem validação independente.
+> **Maturidade e uso pretendido:** o Oráculo X-37 é um protótipo de nível inicial a intermediário, desenvolvido no contexto de aprendizado aplicado do autor em Python e Speckle Automate, com comentário externo opcional via OpenAI.
+>
+> O autor também estuda ferramentas como FastAPI, MCP e Gradio em experimentos separados; este repositório não reivindica integração com elas. Ainda não há tecnologia proprietária disruptiva nem validação comercial consolidada.
+>
+> O projeto não é um modelo preditivo, não realiza cálculo estrutural, não certifica conformidade normativa e não deve fundamentar decisões de segurança ou engenharia sem validação independente.
 
 ## O que a implementação faz hoje
 
