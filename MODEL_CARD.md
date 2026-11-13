@@ -1,51 +1,38 @@
 ---
 language:
-- pt
-- en
+  - pt
 license: apache-2.0
 tags:
-- xai
-- explainable-ai
-- bim
-- speckle
-- predictive-maintenance
-- sovereignty
-- national-security
-metrics:
-- accuracy
-- compliance
-- risk-score
-datasets:
-- custom-bim-models
-model-index:
-- name: Oráculo X-37 XAI
-  results:
-  - task:
-      type: structural-audit
-      name: BIM Structural Audit & XAI Attribution
-    metrics:
-    - name: Compliance Score
-      type: compliance
-      value: 95.5
+  - bim
+  - speckle
+  - heuristic-rules
+  - prototype
 ---
 
-# Oráculo X-37: Inteligência Artificial Explicável (XAI) para Soberania Digital e BIM
+# Oráculo X-37 — cartão de software
 
-## Visão Geral do Modelo
-O **Oráculo X-37** é um sistema avançado de Inteligência Artificial Explicável (XAI) projetado para auditoria preditiva e análise de modelos BIM (Building Information Modeling). Desenvolvido sob os princípios da soberania nacional de dados, o modelo fornece não apenas previsões e detecção de anomalias com alta precisão, mas também **atribuição completa de importância de características (Feature Attribution)** e rastreabilidade de regras de negócio.
+## O que é
 
-## Arquitetura de Explicabilidade (XAI)
-Diferente de modelos de "caixa-preta", o Oráculo X-37 incorpora:
-1. **Transparência de Decisão**: Cada achado de anomalia ou risco estrutural é acompanhado por um percentual de impacto e pontuação de confiança.
-2. **Auditoria de Regras Locais**: Validação cruzada entre metadados BIM e heurísticas de conformidade.
-3. **Relatórios Imersivos**: Geração automática de relatórios de auditoria estruturados em HTML e Markdown com indicadores de conformidade.
+Este repositório contém uma função Python experimental para Speckle Automate. O código percorre objetos BIM e produz contagens por tipo, além de regras simples para presença de IDs e da propriedade `material` em tipos identificados por uma heurística textual.
 
-## Como Usar
-```python
-from transformers import AutoModel
-# O Oráculo X-37 opera integrado ao ecossistema Speckle e motores Aurora AI.
-```
+## Estágio de desenvolvimento
 
----
-**Desenvolvido por Felipe Aquino - Impulso Digital**
-*Liderando a revolução da IA Soberana no Brasil 🇧🇷*
+O projeto reflete a fase de experimentação e estudo prático do autor com ferramentas modernas e é um protótipo de nível inicial a intermediário. Este repositório contém Python, Speckle Automate e uma integração opcional com a API da OpenAI. FastAPI, MCP e Gradio são explorados em outros experimentos e não são funcionalidades ou dependências deste código. Não há tecnologia proprietária disruptiva nem validação comercial consolidada.
+
+## Não é um modelo de machine learning
+
+O repositório não contém pesos de modelo, conjunto de treinamento, benchmark ou resultados de precisão validados. Não existe pontuação de conformidade de 95,5% ou outra métrica de desempenho publicada por este projeto. O comentário opcional gerado pela API da OpenAI é texto auxiliar, não uma previsão, explicação de modelo ou validação independente.
+
+## Uso pretendido e limites
+
+A ferramenta pode apoiar exploração e revisão preliminar de metadados. Ela não realiza cálculos estruturais, não interpreta integralmente propriedades BIM, não certifica conformidade e não deve embasar decisões de engenharia ou segurança sem validação independente.
+
+A identificação de tipos estruturais usa apenas correspondência de palavras (`structure`, `beam`, `column`, `wall`). A verificação de material observa a propriedade `material`; essas regras são incompletas e podem produzir falsos positivos ou negativos.
+
+## Dados e serviço externo
+
+A função pode ser executada sem chave de OpenAI. Se uma chave for configurada, o código envia o prompt fornecido e um resumo agregado por tipo para a API externa. Objetos BIM individuais e IDs não são incluídos nesse resumo. Nomes de tipos e prompts ainda podem ser sensíveis e devem ser avaliados antes do envio.
+
+## Avaliação
+
+Os testes automatizados cobrem comportamento de funções, contagens e escape de conteúdo HTML com objetos sintéticos. Eles não demonstram desempenho em projetos BIM reais, segurança, conformidade normativa nem validade de engenharia.

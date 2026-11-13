@@ -1,8 +1,8 @@
 {
   "speckleToken": "YOUR_SPECKLE_TOKEN",
   "functionInputs": {
-    "openai_api_key": "sk-proj-YOUR_OPENAI_API_KEY",
-    "analysis_prompt": "Realize uma auditoria técnica rigorosa e forneça uma explicação detalhada (XAI) do raciocínio e atribuição de risco para cada componente BIM."
+    "openaiApiKey": null,
+    "analysisPrompt": "Summarize only the aggregate BIM object counts. Do not infer structural safety, regulatory compliance, causal relationships, or risk scores. State that the text is not an engineering assessment."
   },
   "automationRunData": {
     "project_id": "project_id_sample",
@@ -12,7 +12,10 @@
     "function_run_id": "function_run_id_sample",
     "triggers": [
       {
-        "payload": { "modelId": "model_id", "versionId": "version_id" },
+        "payload": {
+          "modelId": "model_id",
+          "versionId": "version_id"
+        },
         "triggerType": "versionCreation"
       }
     ]

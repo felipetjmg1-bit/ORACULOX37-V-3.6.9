@@ -321,3 +321,7 @@ node_modules/
 Thumbs.db
 .venv/
 !.env.example
+
+# Relatórios locais gerados pela execução da automação
+relatorio_aurora.html
+relatorio_aurora.md

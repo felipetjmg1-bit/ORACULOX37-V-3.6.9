@@ -1,42 +1,40 @@
-[project]
-name = "speckle-automate-function"
-version = "0.1.0"
-requires-python = ">=3.11"
-authors = [{ name = "Speckle Systems", email = "hello@speckle.systems" }]
-maintainers = [{ name = "Speckle Systems", email = "hello@speckle.systems" }]
-description = "A Speckle Automate function template using specklepy"
-readme = "README.md"
-license = "Apache-2.0"
-keywords = ["speckle", "automate", "bim", "aec"]
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
+[project]
+name = "oraculo-x37-bim-audit"
+version = "0.2.0"
+description = "Heuristic BIM object checks for Speckle Automate"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [{ name = "Felipe Aquino / Impulso Digital" }]
+keywords = ["speckle", "automate", "bim", "aec", "prototype"]
 dependencies = [
-    "specklepy>=3.2.4",
-    "speckle-automate>=0.1.0",
-    "openai>=2.31.0",
-    "pydantic>=2.13.0"
+    "specklepy==3.2.4",
+    "openai>=2.31.0,<3.0",
+    "pydantic>=2.13.0,<3.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "mypy==2.4.0",
-    "pytest==9.1.1",
-    "ruff==0.17.3",
+    "pytest>=8.0",
+    "ruff>=0.9",
 ]
+
+[tool.setuptools]
+py-modules = ["main", "flatten", "audit"]
 
 [tool.ruff]
-exclude = [".venv", "**/*.yml"]
+line-length = 88
 
 [tool.ruff.lint]
-select = [
-    "E",  # pycodestyle
-    "F",  # pyflakes
-    "UP", # pyupgrade
-    "D",  # pydocstyle
-    "I",  # isort
-]
+select = ["E", "F", "I", "UP", "D"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.setuptools]
-py-modules = []
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
