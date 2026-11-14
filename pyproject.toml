@@ -13,7 +13,7 @@ authors = [{ name = "Felipe Aquino / Impulso Digital" }]
 keywords = ["speckle", "automate", "bim", "aec", "prototype"]
 dependencies = [
     "specklepy==3.2.4",
-    "openai>=2.31.0,<3.0",
+    "openai>=2.31.0,<4.0",
     "pydantic>=2.13.0,<3.0",
 ]
 
