@@ -3,7 +3,7 @@
 <p align="center"><img src="PROJECT-OVERVIEW.svg" alt="Diagrama explicativo de Oráculo X-37 · BIM" width="100%"></p>
 
 
-![Status: experimental](https://img.shields.io/badge/status-em%20desenvolvimento-blue)
+![Status: Automação BIM em desenvolvimento](https://img.shields.io/badge/status-em%20desenvolvimento-blue)
 [![Licença Apache-2.0](https://img.shields.io/github/license/felipetjmg1-bit/ORACULOX37-V-3.6.9)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
 
@@ -96,7 +96,7 @@ Pull requests devem descrever mudanças, verificações executadas e limitaçõe
 
 ## Licença e contato
 
-Este projeto está sob a licença [Apache-2.0](LICENSE). O código e a documentação descrevem o estado observável do protótipo; não representam certificação, promessa de desempenho, prazo de entrega ou garantia de adequação a uma finalidade específica.
+Este projeto está sob a licença [Apache-2.0](LICENSE). O código e a documentação descrevem o estado observável do automação em desenvolvimento; não representam certificação, promessa de desempenho, prazo de entrega ou garantia de adequação a uma finalidade específica.
 
 
 **Empresa responsável:** Impulso Digital Soluções em IA.
