@@ -3,13 +3,13 @@
 <p align="center"><img src="PROJECT-OVERVIEW.svg" alt="Diagrama explicativo de Oráculo X-37 · BIM" width="100%"></p>
 
 
-![Status: experimental](https://img.shields.io/badge/status-experimental-orange)
+![Status: experimental](https://img.shields.io/badge/status-em%20desenvolvimento-blue)
 [![Licença Apache-2.0](https://img.shields.io/github/license/felipetjmg1-bit/ORACULOX37-V-3.6.9)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
 
 **Oráculo X-37** é uma função Python para Speckle Automate. Ela percorre a árvore de objetos recebida e produz contagens e verificações heurísticas simples, com relatórios HTML e Markdown. Um comentário textual opcional pode ser solicitado à API da OpenAI.
 
-> **Maturidade e uso pretendido:** o Oráculo X-37 é um protótipo de nível inicial a intermediário, desenvolvido no contexto de aprendizado aplicado do autor em Python e Speckle Automate, com comentário externo opcional via OpenAI.
+> **Maturidade e uso pretendido:** o Oráculo X-37 é um automação BIM em desenvolvimento, desenvolvido no contexto de aprendizado aplicado do autor em Python e Speckle Automate, com comentário externo opcional via OpenAI.
 >
 > O autor também estuda ferramentas como FastAPI, MCP e Gradio em experimentos separados; este repositório não reivindica integração com elas. Ainda não há tecnologia proprietária disruptiva nem validação comercial consolidada.
 >
