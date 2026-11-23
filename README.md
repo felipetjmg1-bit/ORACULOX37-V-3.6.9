@@ -100,3 +100,8 @@ Este projeto está sob a licença [Apache-2.0](LICENSE). O código e a documenta
 
 
 **Empresa responsável:** Impulso Digital Soluções em IA.
+
+
+## Fluxo passo a passo
+
+Consulte o [guia textual com as etapas do projeto](docs/PROCESSO-PASSO-A-PASSO.md). O infográfico acima resume visualmente o mesmo fluxo.
